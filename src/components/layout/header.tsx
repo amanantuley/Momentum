@@ -12,7 +12,7 @@ const Header: FC<HeaderProps> = ({ addTaskTrigger }) => {
         <div className="flex items-center gap-2">
           <ListChecks className="h-7 w-7 text-primary" />
           <h1 className="font-headline text-2xl font-bold tracking-tight">
-            Task Tracker
+            Momentum
           </h1>
         </div>
         {addTaskTrigger}

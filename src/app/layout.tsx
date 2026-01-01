@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Task Tracker',
-  description: 'Track your daily tasks and build habits.',
+  title: 'Momentum',
+  description: 'Build momentum with daily task tracking.',
 };
 
 export default function RootLayout({
