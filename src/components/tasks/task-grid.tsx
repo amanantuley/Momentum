@@ -9,12 +9,15 @@ import {
   addDays,
   isSameDay,
   isToday,
+  parseISO,
 } from 'date-fns';
 import {
   Check,
   ChevronLeft,
   ChevronRight,
   MoreVertical,
+  Flag,
+  Calendar,
 } from 'lucide-react';
 import type { Task } from '@/lib/types';
 import { getIcon } from '@/lib/task-icons';
@@ -37,6 +40,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 type TaskGridProps = {
   tasks: Task[];
@@ -47,6 +52,13 @@ type TaskGridProps = {
   onPrevMonth: () => void;
   onNextMonth: () => void;
 };
+
+const priorityMap = {
+  high: 'destructive',
+  medium: 'secondary',
+  low: 'outline',
+} as const;
+
 
 const TaskGrid: FC<TaskGridProps> = ({
   tasks,
@@ -118,6 +130,7 @@ const TaskGrid: FC<TaskGridProps> = ({
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
+          <TooltipProvider>
             <Table className="min-w-max">
               <TableHeader>
                 <TableRow>
@@ -146,21 +159,39 @@ const TaskGrid: FC<TaskGridProps> = ({
                       <TableCell className="font-medium sticky left-0 bg-card z-10">
                         <div className="flex items-center gap-2 group">
                           <TaskIcon className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
-                          {editingTaskId === task.id ? (
-                            <Input
-                              ref={inputRef}
-                              value={editingValue}
-                              onChange={(e) => setEditingValue(e.target.value)}
-                              onBlur={() => handleSaveEdit(task.id)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSaveEdit(task.id);
-                                if (e.key === 'Escape') handleCancelEdit();
-                              }}
-                              className="h-8"
-                            />
-                          ) : (
-                            <span className="truncate flex-1" onClick={() => handleEditClick(task)}>{task.name}</span>
-                          )}
+                          <div className="flex-1 flex flex-col gap-1">
+                            {editingTaskId === task.id ? (
+                              <Input
+                                ref={inputRef}
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onBlur={() => handleSaveEdit(task.id)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveEdit(task.id);
+                                  if (e.key === 'Escape') handleCancelEdit();
+                                }}
+                                className="h-8"
+                              />
+                            ) : (
+                              <span className="truncate" onClick={() => handleEditClick(task)}>{task.name}</span>
+                            )}
+                            <div className="flex items-center gap-2">
+                              <Badge variant={priorityMap[task.priority]}>{task.priority}</Badge>
+                              {task.deadline && (
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                          <Calendar className="h-3 w-3" />
+                                          {format(parseISO(task.deadline), 'MMM d')}
+                                      </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                      <p>Deadline: {format(parseISO(task.deadline), 'MMMM d, yyyy')}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                            </div>
+                          </div>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100">
@@ -182,7 +213,7 @@ const TaskGrid: FC<TaskGridProps> = ({
                             <button
                               onClick={() => onToggleCompletion(task.id, dateString)}
                               className={cn(
-                                'flex h-14 w-14 items-center justify-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-ring',
+                                'flex h-16 w-14 items-center justify-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-ring',
                                 isCompleted
                                   ? 'bg-accent/50 hover:bg-accent/70'
                                   : 'hover:bg-muted'
@@ -201,6 +232,7 @@ const TaskGrid: FC<TaskGridProps> = ({
                 })}
               </TableBody>
             </Table>
+            </TooltipProvider>
           </div>
         </CardContent>
       </Card>
@@ -214,8 +246,8 @@ const TaskGrid: FC<TaskGridProps> = ({
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setTaskToDelete(null)}>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

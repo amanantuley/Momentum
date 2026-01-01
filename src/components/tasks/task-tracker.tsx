@@ -3,29 +3,39 @@
 import { useState } from 'react';
 import { addMonths, subMonths } from 'date-fns';
 import { Plus } from 'lucide-react';
-import type { Task } from '@/lib/types';
+import type { Task, TaskPriority } from '@/lib/types';
 import Header from '@/components/layout/header';
 import TaskGrid from '@/components/tasks/task-grid';
 import ProgressSummary from '@/components/tasks/progress-summary';
 import { TaskInputDialog } from '@/components/tasks/task-input-dialog';
 import { Button } from '@/components/ui/button';
+import { type TaskIconName } from '@/lib/task-icons';
 
 const initialTasks: Task[] = [
-  { id: '1', name: 'Morning Meditation', icon: 'think', completions: { '2024-07-01': true, '2024-07-03': true } },
-  { id: '2', name: 'Workout Session', icon: 'workout', completions: { '2024-07-02': true } },
-  { id: '3', name: 'Read 10 pages', icon: 'study', completions: { '2024-07-01': true, '2024-07-02': true, '2024-07-04': true } },
-  { id: '4', name: 'Deep Work Block', icon: 'work', completions: {} },
+  { id: '1', name: 'Morning Meditation', icon: 'think', priority: 'medium', completions: { '2024-07-01': true, '2024-07-03': true } },
+  { id: '2', name: 'Workout Session', icon: 'workout', priority: 'high', completions: { '2024-07-02': true } },
+  { id: '3', name: 'Read 10 pages', icon: 'study', priority: 'low', completions: { '2024-07-01': true, '2024-07-02': true, '2024-07-04': true } },
+  { id: '4', name: 'Deep Work Block', icon: 'work', priority: 'high', completions: {} },
 ];
 
 export default function TaskTracker() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const handleAddTask = (name: string, icon: Task['icon']) => {
+  const handleAddTask = (
+    name: string,
+    icon: TaskIconName,
+    priority: TaskPriority,
+    deadline?: string,
+    notes?: string
+  ) => {
     const newTask: Task = {
       id: crypto.randomUUID(),
       name,
       icon,
+      priority,
+      deadline,
+      notes,
       completions: {},
     };
     setTasks(prevTasks => [...prevTasks, newTask]);
