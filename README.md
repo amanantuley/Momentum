@@ -5,7 +5,7 @@ A **secure, scalable, and analytics-driven daily work tracking platform** that h
 
 Designed for **individuals, students, professionals, and teams**, with a strong focus on **data integrity, usability, and performance**.
 
----
+
 
 ## 🚀 Key Highlights
 
